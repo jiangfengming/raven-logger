@@ -1,0 +1,39 @@
+{
+  "name": "raven-logger",
+  "version": "0.1.0",
+  "description": "Log messages to console and Sentry (optional).",
+  "main": "Logger.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fenivana/raven-logger.git"
+  },
+  "keywords": [
+    "sentry",
+    "raven",
+    "console",
+    "log"
+  ],
+  "author": "Jiang Fengming",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fenivana/raven-logger/issues"
+  },
+  "homepage": "https://github.com/fenivana/raven-logger#readme",
+  "devDependencies": {
+    "eslint": "^4.14.0",
+    "eslint-config-enough": "^0.3.0"
+  },
+  "eslintConfig": {
+    "extends": "enough",
+    "env": {
+      "node": true
+    }
+  },
+  "dependencies": {
+    "colors": "^1.1.2",
+    "moment-timezone": "^0.5.14"
+  }
+}
