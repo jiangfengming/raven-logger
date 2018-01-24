@@ -1,27 +1,37 @@
-const colors = require('colors/safe')
+const chalk = require('chalk')
 const { inspect } = require('util')
 const moment = require('moment-timezone')
 const uid = require('./uid')
 
-colors.setTheme({
-  fatal: ['red', 'bold'],
-  error: 'red',
-  warning: 'yellow',
-  info: 'green',
-  debug: 'blue'
-})
+const colors = {
+  fatal: chalk.bold.red,
+  error: chalk.red,
+  warning: chalk.yellow,
+  info: chalk.green,
+  debug: chalk.blue
+}
+
+const logLevels = ['fatal', 'error', 'warn', 'info', 'debug']
 
 class Logger {
-  constructor({ raven, timezone = true } = {}) {
+  constructor({ raven, timezone = true, level = 'debug' } = {}) {
     this.raven = raven
     this.timezone = timezone
+    this.level = level
   }
 
   log(level, message, meta) {
+    if (logLevels.indexOf(level) > logLevels.indexOf(this.level)) {
+      return { timestamp: '', eventId: '' }
+    }
+
     let error
     if (message instanceof Error) {
       error = message
-      message = inspect(error)
+    }
+
+    if (message.constructor !== String) {
+      message = inspect(message)
     }
 
     let timestamp
@@ -35,13 +45,15 @@ class Logger {
 
     let eventId
     if (this.raven && this.raven.installed) {
-      eventId = error ? this.raven.captureException(error, { level, ...meta }) : this.raven.captureMessage(message, { level, ...meta })
+      eventId = error
+        ? this.raven.captureException(error, { level, ...meta })
+        : this.raven.captureMessage(message, { level, ...meta })
     } else {
       eventId = uid()
     }
 
     let msg = `[${timestamp}] [${eventId}] [${level.toUpperCase()}] ${message}`
-    if (meta) msg += '\n    meta: ' + inspect(meta)
+    if (meta) msg += '\n' + inspect(meta)
     msg = colors[level](msg)
 
     if (['fatal', 'error', 'warning'].includes(level)) {

@@ -1,6 +1,6 @@
 {
   "name": "raven-logger",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Log messages to console and Sentry (optional).",
   "main": "Logger.js",
   "scripts": {
@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/fenivana/raven-logger#readme",
   "devDependencies": {
-    "eslint": "^4.14.0",
+    "eslint": "^4.16.0",
     "eslint-config-enough": "^0.3.0"
   },
   "eslintConfig": {
@@ -33,7 +33,7 @@
     }
   },
   "dependencies": {
-    "colors": "^1.1.2",
+    "chalk": "^2.3.0",
     "moment-timezone": "^0.5.14"
   }
 }
