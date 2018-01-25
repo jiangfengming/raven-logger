@@ -11,7 +11,7 @@ const colors = {
   debug: chalk.blue
 }
 
-const logLevels = ['fatal', 'error', 'warn', 'info', 'debug']
+const logLevels = ['fatal', 'error', 'warning', 'info', 'debug']
 
 class Logger {
   constructor({ raven, timezone = true, level = 'debug' } = {}) {
@@ -25,9 +25,15 @@ class Logger {
       return { timestamp: '', eventId: '' }
     }
 
-    let error
+    let error, trace
     if (message instanceof Error) {
       error = message
+    } else {
+      const obj = {}
+      Error.captureStackTrace(obj)
+      const lines = obj.stack.split('\n')
+      lines.shift()
+      trace = lines.find(line => !line.trim().startsWith('at Logger'))
     }
 
     if (message.constructor !== String) {
@@ -54,6 +60,7 @@ class Logger {
 
     let msg = `[${timestamp}] [${eventId}] [${level.toUpperCase()}] ${message}`
     if (meta) msg += '\n' + inspect(meta)
+    if (trace) msg += '\n' + trace
     msg = colors[level](msg)
 
     if (['fatal', 'error', 'warning'].includes(level)) {

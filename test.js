@@ -17,3 +17,5 @@ console.log(logger.warn('warn'))
 console.log(logger.info('hello'))
 
 console.log(logger.debug('debug'))
+
+console.log(logger.log('debug', 'debug'))
