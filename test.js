@@ -2,7 +2,9 @@
 
 const Logger = require('./Logger')
 
-const logger = new Logger()
+const logger = new Logger({
+  // level: 'info'
+})
 
 console.log(logger.fatal(new Error('fatal')))
 

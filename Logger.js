@@ -28,7 +28,7 @@ class Logger {
     let error, trace
     if (message instanceof Error) {
       error = message
-    } else {
+    } else if (this.level === 'debug') {
       const obj = {}
       Error.captureStackTrace(obj)
       const lines = obj.stack.split('\n')
