@@ -1,6 +1,6 @@
 {
   "name": "raven-logger",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Log messages to console and Sentry (optional).",
   "main": "Logger.js",
   "scripts": {
