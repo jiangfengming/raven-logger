@@ -1,5 +1,5 @@
 const chalk = require('chalk')
-const { inspect } = require('util')
+const { format } = require('util')
 const moment = require('moment-timezone')
 const uid = require('./uid')
 
@@ -14,21 +14,22 @@ const colors = {
 const logLevels = ['fatal', 'error', 'warning', 'info', 'debug']
 
 class Logger {
-  constructor({ raven, timezone = true, level = 'debug' } = {}) {
-    this.raven = raven
+  constructor({ sentry, timezone = true, logLevel = 'debug', reportLevel = 'info' } = {}) {
+    this.sentry = sentry
     this.timezone = timezone
-    this.level = level
+    this.logLevel = logLevel
+    this.reportLevel = reportLevel
   }
 
-  log(level, message, meta) {
-    if (logLevels.indexOf(level) > logLevels.indexOf(this.level)) {
+  log(level, ...messages) {
+    if (logLevels.indexOf(level) > logLevels.indexOf(this.logLevel)) {
       return { timestamp: '', eventId: '' }
     }
 
     let error, trace
-    if (message instanceof Error) {
-      error = message
-    } else if (this.level === 'debug') {
+    if (messages[0] instanceof Error) {
+      error = messages[0]
+    } else if (this.logLevel === 'debug') {
       const obj = {}
       Error.captureStackTrace(obj)
       const lines = obj.stack.split('\n')
@@ -36,9 +37,7 @@ class Logger {
       trace = lines.find(line => !line.trim().startsWith('at Logger'))
     }
 
-    if (message.constructor !== String) {
-      message = inspect(message)
-    }
+    let msg = format(...messages)
 
     let timestamp
     if (this.timezone === true) {
@@ -50,16 +49,15 @@ class Logger {
     }
 
     let eventId
-    if (this.raven && this.raven.installed) {
+    if (this.sentry && logLevels.indexOf(level) > logLevels.indexOf(this.reportLevel)) {
       eventId = error
-        ? this.raven.captureException(error, { level, ...meta })
-        : this.raven.captureMessage(message, { level, ...meta })
+        ? this.sentry.captureException(error)
+        : this.sentry.captureMessage(msg, level)
     } else {
       eventId = uid()
     }
 
-    let msg = `[${timestamp}] [${eventId}] [${level.toUpperCase()}] ${message}`
-    if (meta) msg += '\n' + inspect(meta)
+    msg = `[${timestamp}] [${eventId}] [${level.toUpperCase()}] ${msg}`
     if (trace) msg += '\n' + trace
     msg = colors[level](msg)
 
@@ -72,24 +70,24 @@ class Logger {
     return { timestamp, eventId }
   }
 
-  fatal(...args) {
-    return this.log('fatal', ...args)
+  fatal(...messages) {
+    return this.log('fatal', ...messages)
   }
 
-  error(...args) {
-    return this.log('error', ...args)
+  error(...messages) {
+    return this.log('error', ...messages)
   }
 
-  warn(...args) {
-    return this.log('warning', ...args)
+  warn(...messages) {
+    return this.log('warning', ...messages)
   }
 
-  info(...args) {
-    return this.log('info', ...args)
+  info(...messages) {
+    return this.log('info', ...messages)
   }
 
-  debug(...args) {
-    return this.log('debug', ...args)
+  debug(...messages) {
+    return this.log('debug', ...messages)
   }
 }
 

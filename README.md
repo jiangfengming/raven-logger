@@ -9,41 +9,42 @@ This is often used to display for the user and report an error to customer servi
 
 ## Usage
 ```js
-const raven = require('raven')
+const sentry = require('@sentry/node')
 const Logger = require('raven-logger')
 
-raven.config('https://<key>@sentry.io/<project>').install()
+sentry.init({ dsn: 'https://<key>@sentry.io/<project>' })
 
-const logger = new Logger({ raven })
+const logger = new Logger({ sentry })
 
 const { timestamp, eventId } = logger.error(new Error('error'))
 ```
 
 ## APIs
-### new Logger({ raven, timezone, level = 'debug' })
+### new Logger({ sentry, timezone, logLevel = 'debug', reportLevel: 'info' })
 #### Arguments:
-`raven`: Optional. The raven instance. If not provided, logs won't be send to sentry.  
-`timezone`: Optional. Timezone of timestamp.
-  `String`: [List of tz database time zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
-  `true`: use system timezone.
-  `false`: use UTC timezone.
-  The default is `true`.  
-`level`: Optional. What level of logs to report.
-  Only logs higher than or equal to the given level will be logged.
-  The default is `debug`.
+`sentry`: Optional. The [sentry module](https://www.npmjs.com/package/@sentry/node). If not provided, logs won't be send to sentry.
+
+`timezone`: Optional. Timezone of timestamp. Defaults to `true`.
+  * `String`: [List of tz database time zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
+  * `true`: use system timezone.
+  * `false`: use UTC timezone.
+
+`logLevel`: Optional. What level of logs should output to stdout.
+  Only log level higher than or equal to the given level will be logged.
+  Defaults to `debug`.
+
+`reportLevel`: Optional. What level of logs should report to sentry server.
+  Only log level higher than or equal to the given level will be reported.
+  Defaults to `info`.
 
 ```js
-new Logger({ raven, timezone: 'Asia/Shanghai' })
+new Logger({ sentry, timezone: 'Asia/Shanghai' })
 ```
 
-### Logger.log(level, message, meta)
+### Logger.log(level, ...messages)
 #### Arguments:
-`level`: Log level. `debug`, `info`, `warning`, `error`, `fatal`. Will be set as `level` of
-  [Additional Data](https://docs.sentry.io/clients/node/usage/#additional-data) when sending to sentry.  
-`message`: `String` or `Error` Object.  
-`meta`: Will be stringify using [util.inspect](https://nodejs.org/api/util.html#util_util_inspect_object_options) and
-  append to the message when logging to console. And will be used as
-  [Additional Data](https://docs.sentry.io/clients/node/usage/#additional-data) when sending to sentry.  
+`level`: Log level. `debug`, `info`, `warning`, `error`, `fatal`.
+`...message`: same arguments as `console.log(...messages)`
 
 #### Returns:
 ```js
@@ -52,20 +53,20 @@ new Logger({ raven, timezone: 'Asia/Shanghai' })
 
 If the log level is disabled logging, `timestamp` and `eventId` will be empty string.
 
-### Logger.debug(message, meta)
-Alias of Logger.log('debug', message, meta)
+### Logger.debug(...messages)
+Alias of Logger.log('debug', ...messages)
 
-### Logger.info(message, meta)
-Alias of Logger.log('info', message, meta)
+### Logger.info(...messages)
+Alias of Logger.log('info', ...messages)
 
-### Logger.warn(message, meta)
-Alias of Logger.log('warning', message, meta)
+### Logger.warn(...messages)
+Alias of Logger.log('warning', ...messages)
 
-### Logger.error(message, meta)
-Alias of Logger.log('error', message, meta)
+### Logger.error(...messages)
+Alias of Logger.log('error', ...messages)
 
-### Logger.fatal(message, meta)
-Alias of Logger.log('fatal', message, meta)
+### Logger.fatal(...messages)
+Alias of Logger.log('fatal', ...messages)
 
 ### Logger.level
 Set log level.

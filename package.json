@@ -8,23 +8,25 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fenivana/raven-logger.git"
+    "url": "git+https://github.com/kasha-io/raven-logger.git"
   },
   "keywords": [
     "sentry",
     "raven",
     "console",
-    "log"
+    "log",
+    "debug"
   ],
   "author": "Jiang Fengming",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/fenivana/raven-logger/issues"
+    "url": "https://github.com/kasha-io/raven-logger/issues"
   },
-  "homepage": "https://github.com/fenivana/raven-logger#readme",
+  "homepage": "https://github.com/kasha-io/raven-logger#readme",
   "devDependencies": {
-    "eslint": "^4.16.0",
-    "eslint-config-enough": "^0.3.0"
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.9.0",
+    "eslint-config-enough": "^0.3.4"
   },
   "eslintConfig": {
     "extends": "enough",
@@ -33,7 +35,7 @@
     }
   },
   "dependencies": {
-    "chalk": "^2.3.0",
-    "moment-timezone": "^0.5.14"
+    "chalk": "^2.4.1",
+    "moment-timezone": "^0.5.23"
   }
 }
