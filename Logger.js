@@ -11,17 +11,20 @@ const colors = {
   debug: chalk.blue
 }
 
-const logLevels = ['fatal', 'error', 'warning', 'info', 'debug']
+const logLevels = ['critical', 'fatal', 'error', 'warning', 'info', 'log', 'debug']
 
 class Logger {
-  constructor({ sentry, timezone = true, logLevel = 'debug', reportLevel = 'info' } = {}) {
+  constructor({ sentry, timezone = true, logLevel = 'debug', reportLevel = 'info', debugTrace = true } = {}) {
     this.sentry = sentry
     this.timezone = timezone
     this.logLevel = logLevel
     this.reportLevel = reportLevel
+    this.debugTrace = debugTrace
   }
 
-  log(level, ...messages) {
+  _log(level, ...messages) {
+    if (level === 'warn') level = 'warning'
+
     if (logLevels.indexOf(level) > logLevels.indexOf(this.logLevel)) {
       return { timestamp: '', eventId: '' }
     }
@@ -29,7 +32,7 @@ class Logger {
     let error, trace
     if (messages[0] instanceof Error) {
       error = messages[0]
-    } else if (this.logLevel === 'debug') {
+    } else if (this.logLevel === 'debug' && this.debugTrace) {
       const obj = {}
       Error.captureStackTrace(obj)
       const lines = obj.stack.split('\n')
@@ -48,16 +51,18 @@ class Logger {
       timestamp = moment().tz(this.timezone).format()
     }
 
-    let eventId
-    if (this.sentry && logLevels.indexOf(level) > logLevels.indexOf(this.reportLevel)) {
-      eventId = error
-        ? this.sentry.captureException(error)
-        : this.sentry.captureMessage(msg, level)
-    } else {
-      eventId = uid()
+    let eventId = ''
+    if (logLevels.indexOf(level) > logLevels.indexOf(this.reportLevel)) {
+      if (this.sentry) {
+        eventId = error ? this.sentry.captureException(error) : this.sentry.captureMessage(msg, level)
+      } else {
+        eventId = uid()
+      }
     }
 
-    msg = `[${timestamp}] [${eventId}] [${level.toUpperCase()}] ${msg}`
+    msg = `[${timestamp}]`
+    if (eventId) msg += ` [${eventId}]`
+    msg += ` [${level}] ${msg}`
     if (trace) msg += '\n' + trace
     msg = colors[level](msg)
 
@@ -70,24 +75,32 @@ class Logger {
     return { timestamp, eventId }
   }
 
+  critical(...messages) {
+    return this._log('critical', ...messages)
+  }
+
   fatal(...messages) {
-    return this.log('fatal', ...messages)
+    return this._log('fatal', ...messages)
   }
 
   error(...messages) {
-    return this.log('error', ...messages)
+    return this._log('error', ...messages)
   }
 
   warn(...messages) {
-    return this.log('warning', ...messages)
+    return this._log('warning', ...messages)
   }
 
   info(...messages) {
-    return this.log('info', ...messages)
+    return this._log('info', ...messages)
+  }
+
+  log(...messages) {
+    return this._log('log', ...messages)
   }
 
   debug(...messages) {
-    return this.log('debug', ...messages)
+    return this._log('debug', ...messages)
   }
 }
 
