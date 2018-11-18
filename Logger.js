@@ -29,10 +29,9 @@ class Logger {
       return { timestamp: '', eventId: '' }
     }
 
-    let error, trace
-    if (messages[0] instanceof Error) {
-      error = messages[0]
-    } else if (this.logLevel === 'debug' && this.debugTrace) {
+    let trace
+    const error = messages.find(m => m instanceof Error)
+    if (!error && this.logLevel === 'debug' && this.debugTrace) {
       const obj = {}
       Error.captureStackTrace(obj)
       const lines = obj.stack.split('\n')
@@ -52,19 +51,27 @@ class Logger {
     }
 
     let eventId = ''
-    if (logLevels.indexOf(level) > logLevels.indexOf(this.reportLevel)) {
+    if (logLevels.indexOf(level) <= logLevels.indexOf(this.reportLevel)) {
       if (this.sentry) {
-        eventId = error ? this.sentry.captureException(error) : this.sentry.captureMessage(msg, level)
+        if (error) {
+          this.sentry.withScope(scope => {
+            scope.setLevel(level)
+            if (messages.length > 1) {
+              scope.setExtra('message', msg)
+            }
+            eventId = this.sentry.captureException(error)
+          })
+        } else {
+          eventId = this.sentry.captureMessage(msg, level)
+        }
       } else {
         eventId = uid()
       }
     }
 
-    msg = `[${timestamp}]`
-    if (eventId) msg += ` [${eventId}]`
-    msg += ` [${level}] ${msg}`
-    if (trace) msg += '\n' + trace
-    msg = colors[level](msg)
+    msg = colors[level](
+      `[${timestamp}]${eventId ? '[' + eventId + ']' : ''} [${level}] ${msg}${trace ? '\n' + trace : ''}`
+    )
 
     if (['fatal', 'error', 'warning'].includes(level)) {
       console.error(msg) // eslint-disable-line
