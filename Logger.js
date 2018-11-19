@@ -4,11 +4,13 @@ const moment = require('moment-timezone')
 const uid = require('./uid')
 
 const colors = {
-  fatal: chalk.bold.red,
-  error: chalk.red,
+  critical: chalk.bold.red,
+  fatal: chalk.red,
+  error: chalk.magenta,
   warning: chalk.yellow,
   info: chalk.green,
-  debug: chalk.blue
+  log: chalk.blue,
+  debug: chalk.white
 }
 
 const logLevels = ['critical', 'fatal', 'error', 'warning', 'info', 'log', 'debug']

@@ -2,22 +2,12 @@
 
 const Logger = require('./Logger')
 
-const logger = new Logger({
-  // level: 'info'
-})
+const logger = new Logger()
 
-console.log(logger.fatal(new Error('fatal')))
-
-console.log(logger.error(new Error('error'), {
-  user: {
-    name: 'matt'
-  }
-}))
-
-console.log(logger.warn('warn'))
-
-console.log(logger.info('hello'))
-
-console.log(logger.debug('debug'))
-
-console.log(logger.log('debug', 'debug'))
+logger.critical(new Error('critical'))
+logger.fatal(new Error('fatal'))
+logger.error(new Error('error'))
+logger.warn('warn')
+logger.info('hello')
+logger.log('log', 'msg')
+logger.debug('debug')
