@@ -23,9 +23,13 @@
     "url": "https://github.com/kasha-io/raven-logger/issues"
   },
   "homepage": "https://github.com/kasha-io/raven-logger#readme",
+  "dependencies": {
+    "chalk": "^2.4.2",
+    "moment-timezone": "^0.5.23"
+  },
   "devDependencies": {
     "babel-eslint": "^10.0.1",
-    "eslint": "^5.9.0",
+    "eslint": "^5.16.0",
     "eslint-config-enough": "^0.3.4"
   },
   "eslintConfig": {
@@ -33,9 +37,5 @@
     "env": {
       "node": true
     }
-  },
-  "dependencies": {
-    "chalk": "^2.4.1",
-    "moment-timezone": "^0.5.23"
   }
 }

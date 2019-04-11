@@ -25,7 +25,9 @@ class Logger {
   }
 
   _log(level, ...messages) {
-    if (level === 'warn') level = 'warning'
+    if (level === 'warn') {
+      level = 'warning'
+    }
 
     if (logLevels.indexOf(level) > logLevels.indexOf(this.logLevel)) {
       return { timestamp: '', eventId: '' }
@@ -33,6 +35,7 @@ class Logger {
 
     let trace
     const error = messages.find(m => m instanceof Error)
+
     if (!error && this.logLevel === 'debug' && this.debugTrace) {
       const obj = {}
       Error.captureStackTrace(obj)
@@ -42,8 +45,8 @@ class Logger {
     }
 
     let msg = format(...messages)
-
     let timestamp
+
     if (this.timezone === true) {
       timestamp = moment().format()
     } else if (!this.timezone) {
@@ -53,11 +56,13 @@ class Logger {
     }
 
     let eventId = ''
+
     if (logLevels.indexOf(level) <= logLevels.indexOf(this.reportLevel)) {
       if (this.sentry) {
         if (error) {
           this.sentry.withScope(scope => {
             scope.setLevel(level)
+
             if (messages.length > 1) {
               scope.setExtra('message', msg)
             }
