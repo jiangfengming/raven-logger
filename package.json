@@ -1,6 +1,6 @@
 {
   "name": "raven-logger",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Logging messages to stdout/stderr as well as reporting to Sentry in one command.",
   "main": "Logger.js",
   "scripts": {
